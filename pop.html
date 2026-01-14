@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carbon Footprint Calculator 🌎</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      color: white;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    header p {
+      font-size: 1.2rem;
+      opacity: 0.95;
+    }
+    
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .input-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #444;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 30px 0 20px 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    #results {
+      margin: 30px 0;
+      padding: 25px;
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 1.3rem;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    #results strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #444;
+    }
+    
+    #results .emission-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .chart-container {
+      margin: 30px 0;
+      display: none;
+    }
+    
+    #interpretation {
+      margin: 30px 0 20px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    #interpretation h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    #recommendations {
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    #recommendations h3 {
+      color: #856404;
+      margin-bottom: 15px;
+    }
+    
+    #recommendations ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    #recommendations li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+    }
+    
+    #recommendations li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #28a745;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-size: 1.1rem;
+      margin-top: 40px;
+    }
+    
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      .container {
+        padding: 25px;
+      }
+      
+      #results .emission-value {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌍 Carbon Footprint Calculator</h1>
+  <p>Measure. Understand. Improve Your Impact.</p>
+</header>
+
+<main>
+  <div class="container">
+    <div class="input-group">
+      <label for="car">🚗 Daily Car Travel (km):</label>
+      <input type="number" id="car" placeholder="e.g., 20" min="0" step="0.1">
+    </div>
+
+    <div class="input-group">
+      <label for="electricity">💡 Daily Electricity Use (kWh):</label>
+      <input type="number" id="electricity" placeholder="e.g., 10" min="0" step="0.1">
+    </div>
+
+    <div class="input-group">
+      <label for="meat">🍖 Daily Meat Consumption (kg):</label>
+      <input type="number" id="meat" placeholder="e.g., 0.3" min="0" step="0.01">
+    </div>
+
+    <div class="input-group">
+      <label for="veg">🥦 Daily Vegetable Consumption (kg):</label>
+      <input type="number" id="veg" placeholder="e.g., 0.5" min="0" step="0.01">
+    </div>
+
+    <button onclick="calculate()">Calculate My Footprint</button>
+
+    <div id="results"></div>
+    
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+    
+    <div id="interpretation"></div>
+    <div id="recommendations"></div>
+  </div>
+</main>
+
+<footer>
+  🌎 Together, we can build a sustainable future!
+</footer>
+
+<script>
+let chartInstance;
+
+function calculate() {
+  const car = parseFloat(document.getElementById('car').value) || 0;
+  const electricity = parseFloat(document.getElementById('electricity').value) || 0;
+  const meat = parseFloat(document.getElementById('meat').value) || 0;
+  const veg = parseFloat(document.getElementById('veg').value) || 0;
+
+  // Emission factors
+  const carEmission = car * 0.192; // kg CO2/km (average gasoline car)
+  const electricityEmission = electricity * 0.527; // kg CO2/kWh (global average)
+  const meatEmission = meat * 27; // kg CO2/kg (beef average)
+  const vegEmission = veg * 2; // kg CO2/kg (average vegetables)
+
+  const totalEmission = carEmission + electricityEmission + meatEmission + vegEmission;
+  const annualEmission = (totalEmission * 365 / 1000).toFixed(2); // Convert to tonnes per year
+
+  // Display results
+  document.getElementById('results').innerHTML = `
+    <strong>Your Daily Carbon Footprint:</strong>
+    <div class="emission-value">${totalEmission.toFixed(2)} kg CO₂</div>
+    <p style="margin-top: 10px; color: #666;">Annual estimate: ${annualEmission} tonnes CO₂</p>
+  `;
+  document.getElementById('results').style.display = 'block';
+
+  // Create/Update chart
+  const ctx = document.getElementById('chart').getContext('2d');
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+  
+  chartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['🚗 Car Travel', '💡 Electricity', '🍖 Meat', '🥦 Vegetables'],
+      datasets: [{
+        label: 'CO₂ Emissions (kg)',
+        data: [carEmission, electricityEmission, meatEmission, vegEmission],
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0'
+        ],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 15,
+            font: {
+              size: 12,
+              family: 'Poppins'
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const percentage = ((value / totalEmission) * 100).toFixed(1);
+              return `${label}: ${value.toFixed(2)} kg (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  document.querySelector('.chart-container').style.display = 'block';
+
+  // Interpretation
+  const emissions = [
+    { name: 'car travel 🚗', value: carEmission },
+    { name: 'electricity usage 💡', value: electricityEmission },
+    { name: 'meat consumption 🍖', value: meatEmission },
+    { name: 'vegetable consumption 🥦', value: vegEmission }
+  ];
+  
+  const sorted = emissions.sort((a, b) => b.value - a.value);
+  const mainSource = sorted[0];
+  const percentage = ((mainSource.value / totalEmission) * 100).toFixed(1);
+
+  document.getElementById('interpretation').innerHTML = `
+    <h3>🔍 Analysis</h3>
+    <p><strong>${mainSource.name.charAt(0).toUpperCase() + mainSource.name.slice(1)}</strong> is your largest contributor, accounting for <strong>${percentage}%</strong> of your carbon footprint.</p>
+  `;
+  document.getElementById('interpretation').style.display = 'block';
+
+  // Personalized recommendations
+  let recs = "<h3>🌱 Your Personalized Action Plan</h3><ul>";
+  
+  if (car > 20) {
+    recs += "<li><strong>Transportation:</strong> Consider carpooling, public transit, or biking for short trips. Reducing daily travel by 10 km could save 701 kg CO₂ annually!</li>";
+  } else if (car > 10) {
+    recs += "<li><strong>Transportation:</strong> You're doing well! Try one car-free day per week to further reduce emissions.</li>";
+  } else if (car > 0) {
+    recs += "<li><strong>Transportation:</strong> Excellent! Your car usage is already low. Keep it up!</li>";
+  }
+  
+  if (electricity > 12) {
+    recs += "<li><strong>Energy:</strong> Switch to LED bulbs, unplug devices when not in use, and consider renewable energy sources.</li>";
+  } else if (electricity > 8) {
+    recs += "<li><strong>Energy:</strong> Good energy habits! Consider a home energy audit to find more savings.</li>";
+  } else if (electricity > 0) {
+    recs += "<li><strong>Energy:</strong> Great energy efficiency! You're setting a wonderful example.</li>";
+  }
+  
+  if (meat > 0.4) {
+    recs += "<li><strong>Diet:</strong> Try 'Meatless Mondays' or reduce portion sizes. Plant-based meals can cut food emissions by up to 73%!</li>";
+  } else if (meat > 0.2) {
+    recs += "<li><strong>Diet:</strong> Moderate meat consumption. Consider replacing red meat with chicken or fish occasionally.</li>";
+  } else if (meat > 0) {
+    recs += "<li><strong>Diet:</strong> Excellent! Your meat consumption is already low-impact.</li>";
+  }
+  
+  if (veg >= 0.4) {
+    recs += "<li><strong>Nutrition:</strong> Fantastic vegetable intake! You're promoting both health and sustainability. 🥗</li>";
+  } else if (veg > 0) {
+    recs += "<li><strong>Nutrition:</strong> Consider increasing vegetable portions for better health and lower environmental impact.</li>";
+  }
+  
+  // Overall assessment
+  if (totalEmission < 5) {
+    recs += "<li><strong>Overall:</strong> Outstanding! Your footprint is well below average. Share your habits to inspire others! 🌟</li>";
+  } else if (totalEmission < 10) {
+    recs += "<li><strong>Overall:</strong> You're doing better than average! Small improvements can make you a sustainability leader.</li>";
+  } else if (totalEmission < 20) {
+    recs += "<li><strong>Overall:</strong> There's room for improvement. Focus on your biggest contributor for maximum impact.</li>";
+  } else {
+    recs += "<li><strong>Overall:</strong> Consider this your starting point! Every small change adds up to significant impact over time.</li>";
+  }
+  
+  recs += "</ul>";
+  
+  document.getElementById('recommendations').innerHTML = recs;
+  document.getElementById('recommendations').style.display = 'block';
+
+  // Smooth scroll to results
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Allow Enter key to calculate
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('input');
+  inputs.forEach(input => {
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        calculate();
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
